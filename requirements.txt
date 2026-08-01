@@ -1,6 +1,5 @@
-fastapi
-uvicorn
+flask
+gunicorn
 librosa
 numpy
 scikit-learn
-soundfile
