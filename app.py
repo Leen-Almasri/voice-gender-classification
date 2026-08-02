@@ -6,26 +6,43 @@ from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
-# تحميل الموديل
+# Load trained model
 model = pickle.load(open("model.pkl", "rb"))
 
-# استخراج الخصائص من الصوت (FIXED)
+
+# Extract audio features (MFCC)
 def extract_features(file):
     try:
-        # حفظ الملف مؤقتًا
+        # Save uploaded file temporarily
         with tempfile.NamedTemporaryFile(delete=False) as temp:
             file.save(temp.name)
-            y, sr = librosa.load(temp.name, duration=3, offset=0.5)
 
+            # Load audio with fixed sample rate
+            y, sr = librosa.load(
+                temp.name,
+                sr=22050,       # Force consistent sample rate
+                duration=3,     # Limit duration
+                offset=0.5      # Skip initial silence
+            )
+
+        # Check if audio is empty
+        if len(y) == 0:
+            return None
+
+        # Extract MFCC features
         mfcc = np.mean(
-            librosa.feature.mfcc(y=y, sr=sr, n_mfcc=40).T,
+            librosa.feature.mfcc(
+                y=y,
+                sr=sr,
+                n_mfcc=40
+            ).T,
             axis=0
         )
 
         return mfcc.reshape(1, -1)
 
     except Exception as e:
-        print("Error in feature extraction:", e)
+        print("Feature extraction error:", e)
         return None
 
 
@@ -36,19 +53,25 @@ def home():
 
 @app.route("/predict", methods=["POST"])
 def predict():
+    # Check if file exists in request
     if "file" not in request.files:
         return jsonify({"error": "No file provided"}), 400
 
     file = request.files["file"]
 
+    # Extract features from audio
     features = extract_features(file)
 
     if features is None:
         return jsonify({"error": "Feature extraction failed"}), 500
 
     try:
+        # Make prediction
         prediction = model.predict(features)[0]
-        return jsonify({"prediction": str(prediction)})
+
+        return jsonify({
+            "prediction": str(prediction)
+        })
 
     except Exception as e:
         print("Prediction error:", e)
