@@ -1,6 +1,5 @@
-flask
-gunicorn
-numpy>=2.0
-librosa==0.10.1
+numpy
+librosa
 soundfile
-scikit-learn==1.4.2
+scikit-learn
+gradio
