@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+streamlit
+requests
+librosa
+numpy
+scikit-learn
+joblib
+soundfile
