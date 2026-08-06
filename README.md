@@ -1,16 +1,4 @@
----
-title: Voice Gender Classifier
-emoji: 🎙️
-colorFrom: blue
-colorTo: purple
-sdk: streamlit
-sdk_version: "1.38.0"
-python_version: "3.10"
-app_file: streamlit_app.py
-pinned: false
----
 
-<div align="center">
 
 # 🎙️ Voice Gender Classifier
 
